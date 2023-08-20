@@ -18,14 +18,10 @@ struct DistanceResult {
 
 class SearchResult
 {
-protected:
-    int resultCount = 0;
-    distance_t max_distance = -1.0;
-    /* data */
 public:
-    SearchResult(/* args */);
+    SearchResult();
     ~SearchResult();
-    virtual distance_t get_max_distance();
+    virtual bool isInRadius(distance_t minDistance);
     virtual void add(DistanceResult result);
     void add(id_t id, distance_t distance_t);
     void toList(vector<DistanceResult>& result_list);
@@ -38,9 +34,9 @@ private:
     DistanceResult *resultList;
 
 public:
-    TopkSearchResult(int k, bool smallIsBetter);
+    TopkSearchResult(int k);
     ~TopkSearchResult();
-    distance_t get_max_distance();
+    bool isInRadius(distance_t minDistance);;
     void add(id_t id, distance_t distance);
     void add(DistanceResult result);
     void toList(vector<DistanceResult>& result_list);
@@ -54,8 +50,9 @@ private:
 public:
     RadiusSearchResult(distance_t radius);
     ~RadiusSearchResult();
-    distance_t get_max_distance();
+    bool isInRadius(distance_t minDistance);;
     void add(DistanceResult result);
+    void add(id_t id, distance_t distance);
     void toList(vector<DistanceResult>& result_list);
 };
 
