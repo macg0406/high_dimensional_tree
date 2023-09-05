@@ -12,6 +12,8 @@ using std::vector;
 
 SearchResult::SearchResult()
 {
+    this->skipCount = 0;
+    this->calculateCount = 0;
 }
 
 SearchResult::~SearchResult()
@@ -23,13 +25,6 @@ void SearchResult::add(id_t id, distance_t distance) {
     result.id = id;
     result.distance = distance;
     this->add(result);
-}
-
-void SearchResult::add(DistanceResult result) {
-}
-
-bool SearchResult::isInRadius(distance_t minDistance) {
-    return true;
 }
 
 void SearchResult::toList(vector<DistanceResult>& result_list) {
@@ -46,12 +41,23 @@ TopkSearchResult::~TopkSearchResult() {
     delete[] this->resultList;
 }
 
-bool TopkSearchResult::isInRadius(distance_t minDistance) {
+// bool TopkSearchResult::isInRadius(distance_t minDistance) {
+//     if (this->size < this->k) {
+//         return true;
+//     } else {
+//         return this->resultList[0].distance > minDistance;
+//     }
+// }
+
+int TopkSearchResult::getAcceptCount() {
     if (this->size < this->k) {
-        return true;
-    } else {
-        return this->resultList[0].distance > minDistance;
+        return (this->k - this->size);
     }
+    return 0;
+}
+
+distance_t TopkSearchResult::getRadius() {
+    return this->resultList[0].distance;
 }
 
 void TopkSearchResult::add(id_t id, distance_t distance) {
@@ -68,21 +74,27 @@ void swapSearchResult(DistanceResult* heapArray, int i, int j){
 }
 
 /**
- * @brief max heap down
+ * @brief Max heapify the heap array starting from a given index.
  * 
- * @param heapArray the point to heap array.
- * @param heapSize the size of the heap.
- * @param start the start index of the heap.
-*/
-void maxHeapDown(DistanceResult* heapArray, int heapSize, int start){
+ * @param heapArray Pointer to the heap array.
+ * @param heapSize The size of the heap.
+ * @param start The start index of the heap.
+ */
+void maxHeapify(DistanceResult* heapArray, int heapSize, int start) {
     int dad = start;
     int son = dad * 2 + 1;
+
     while (son < heapSize) {
-        if (son + 1 < heapSize && heapArray[son].distance < heapArray[son + 1].distance)
+        // Find the larger child
+        if (son + 1 < heapSize && heapArray[son].distance < heapArray[son + 1].distance) {
             son++;
-        if (heapArray[dad].distance > heapArray[son].distance)
+        }
+
+        // If the parent is larger, exit the loop
+        if (heapArray[dad].distance > heapArray[son].distance) {
             return;
-        else {
+        } else {
+            // Swap parent and child
             swapSearchResult(heapArray, dad, son);
             dad = son;
             son = dad * 2 + 1;
@@ -135,10 +147,28 @@ RadiusSearchResult::~RadiusSearchResult() {
 }
 
 
-bool RadiusSearchResult::isInRadius(distance_t minDistance) {
-    return minDistance <= this->radius;
+// bool RadiusSearchResult::isInRadius(distance_t minDistance) {
+//     return minDistance <= this->radius;
+// }
+
+/**
+ * for the radius search, it dont accept any value other than accept value with in the radius
+ *
+ * @return The accept count, always 0.
+ */
+int RadiusSearchResult::getAcceptCount() {
+    return 0;
 }
 
+distance_t RadiusSearchResult::getRadius() {
+    return this->radius;
+}
+
+/**
+ * @brief Adds a distance result to the radius search result if the distance is within the specified radius.
+ * 
+ * @param result The distance result to add.
+ */
 void RadiusSearchResult::add(DistanceResult result) {
     if (result.distance <= this->radius) {
         this->resultList.push_back(result);

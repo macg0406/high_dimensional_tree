@@ -14,6 +14,7 @@ and a vector of children
 
 using namespace std;
 #include "knn_search_result.h"
+#include "high_dimensional_area.h"
 
 
 struct NDVector
@@ -60,13 +61,20 @@ protected:
     bool is_left_closer(const HighDimensionalNode *node, const vector<float>& data) const;
     bool is_left_closer(const HighDimensionalNode *node, const HighDimensionalNode *newNode) const;
     distance_t minDistance(const HighDimensionalNode *node, const vector<float>& new_node, vector<float>& projectionPoint) const;
-    void _search(const HighDimensionalNode *node, const vector<float>& data, const vector<float>& dist_point, SearchResult& result) const;
+    void _search(
+        const HighDimensionalNode *node,
+        const vector<float> &data,
+        const vector<float> &dist_point,
+        SearchResult &result,
+        HighDimensionalArea &searchArea
+    ) const;
+    void _searchWithoutCondition(const HighDimensionalNode *node, const vector<float> &dist_point, SearchResult &result) const;
     virtual distance_t distance(const float *data1, const float *data2) const;
     distance_t distance(const vector<float>& data1, const vector<float>& data2) const;
     distance_t distance(const float *data1, const vector<float>& data2) const;
     distance_t distance(const HighDimensionalNode *node1, const HighDimensionalNode *node2) const;
     distance_t distance(const HighDimensionalNode *node, const vector<float>& data) const;
-
+    void addToSearchArea(const HighDimensionalNode *node, HighDimensionalArea &searchArea, bool leftDirection) const;
 };
 
 
